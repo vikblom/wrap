@@ -12,8 +12,21 @@ import (
 
 func TestWrapErrorf(t *testing.T) {
 	err := wrap.Errorf("kaboom: %d", 123)
+
 	got := err.Error()
-	want := "(wrap_test.go:14) kaboom: 123"
+	want := "(wrap_test.go:14): kaboom: 123"
+	if d := cmp.Diff(want, got); d != "" {
+		t.Fatalf("error mismatch (-want, +got):\n%s", d)
+	}
+}
+
+func TestWrapMultipleErrorf(t *testing.T) {
+	err := wrap.Errorf("crash: %d", 123)
+	err = wrap.Errorf("boom: %w", err)
+	err = wrap.Errorf("pang: %w", err)
+
+	got := err.Error()
+	want := "(wrap_test.go:26): pang: (wrap_test.go:25): boom: (wrap_test.go:24): crash: 123"
 	if d := cmp.Diff(want, got); d != "" {
 		t.Fatalf("error mismatch (-want, +got):\n%s", d)
 	}

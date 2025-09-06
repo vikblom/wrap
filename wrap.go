@@ -25,7 +25,7 @@ func (e *locError) Error() string {
 	pcs := []uintptr{e.pc}
 	frame, _ := runtime.CallersFrames(pcs).Next()
 	filename := filepath.Base(frame.File)
-	return fmt.Sprintf("(%s:%d) ", filename, frame.Line) + e.inner.Error()
+	return fmt.Sprintf("(%s:%d): ", filename, frame.Line) + e.inner.Error()
 }
 
 func (e *locError) Unwrap() error {
